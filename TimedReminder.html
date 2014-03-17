@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reminder Tool</title>
+</head>	
+<body>
+<!-------------------------------------------------------------->
+<!-------------------------------------------------------------->
+<script>
+document.addEventListener("deviceready", onDeviceReady, false);
+
+function onDeviceReady() {
+  setTimeout( function() {
+	document.getElementById('padeHeader').style.display="";
+	document.getElementById('menuMain').style.display="";
+	document.getElementById('deviceBoot').style.display="none";
+	switchToPage("menuMain");
+  },1000);}
+  
+onDeviceReady()
+</script>
+<!-------------------------------------------------------------->
+<style type="text/css">
+body{
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 24px;
+	text-align: center;
+}
+select,input[type=file]{
+    font-family: inherit;
+    font-size: inherit;
+	border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px; 
+}
+button{
+    font-family: inherit;
+    font-size: 48px;
+	font-weight: bold;
+    border-radius: 15px;
+}
+#appHeader{
+    font-family: inherit;
+    font-size: 38px;
+	font-weight:bold;
+}
+#inFile{
+    font-family: inherit;
+    font-size: 24px;
+}
+</style>
+<!-------------------------------------------------------------->
+<!-------------------------------------------------------------->
+
+<table border="0" width="384" height="640" cellpadding="0" cellspacing="0" style="color:white; background:darkblue;">
+
+<!-------------------------------------------------------------->
+
+<tr id="padeHeader" style="display:none">
+  <th align="center" valign="center" height="80" style="color:white; background:black;">
+    <div id="appHeader">Reminder Tool</div>
+  </th>
+</tr>
+  
+<tr data-role="page" id="deviceBoot">
+  <td align="center" valign="center">
+	<h1>LOADING</h1>
+  </td>
+</tr>  
+
+<!-------------------------------------------------------------->
+
+<tr data-role="page" id="menuMain" style="display:none"><td>
+  <table border="0" width="100%" height="100%">
+  
+  <tr><th align="center" valign="center">
+    <h2>This Application shows a random picture after the countdown.</h2>
+  </th></tr>
+  
+  <tr><td align="center" valign="center">
+  
+  <table border="0">
+  <tr><td align="center">
+	  Select Timer
+  </td></tr>
+  <tr><td align="center">
+      <select id="myTimeout">
+      <option value="1">1</option>
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      </select>
+  </td></tr>
+  <tr><td align="center">
+	  Select Images
+  </td></tr>
+  <tr><td align="center">
+    <button id="inFile" onclick=files.click()>0 Images</button>
+  </td></tr>
+  </table>
+  
+  </td></tr>
+  
+  <tr><td align="center" valign="center" height="100">
+    <button onclick="initAlert()">Start</button>
+    <button onclick="quitProg()">&nbsp;Exit&nbsp;</button>
+  </td></tr>
+  
+  </table>
+</td></tr>
+
+<input type="file" id="files" name="files[]" style="display:none" multiple/>
+
+<!-------------------------------------------------------------->
+
+<tr data-role="page" id="menuCount" align="center" style="display:none"><td>
+  <table border="0" width="100%" height="100%">
+  
+  <tr><td align="center" valign="center">
+	<div id="MyTime" style="font-size:450%; font-weight:bold;"></div>
+  </td></tr>
+  
+  <tr><td align="center" valign="center" height="100">
+    <button onclick="cancleAlert()">Cancle</button>
+  </td></tr>
+  
+  </table>
+</td></tr>
+
+<!-------------------------------------------------------------->
+
+<tr data-role="page" id="menuAlert" align="center" style="display:none"><td>
+  <table border="0" width="100%" height="100%">
+  
+  <tr><td align="center" valign="center">
+	<div id="imgText">Image Text</div>
+	<img id="imgField" src="" width="95%" style="display: block; margin: 0 auto">
+  </td></tr>
+  
+  <tr><td align="center" valign="center" height="100">
+	<button onclick="initAlert()">Again</button>
+    <button onclick="cancleAlert()">Cancle</button>
+  </td></tr>
+  
+  </table>
+</td></tr>
+
+<!-------------------------------------------------------------->
+</table>
+<!-------------------------------------------------------------->
+<!-------------------------------------------------------------->
+<script>
+//---------------------------------------------------------------
+// script für eine einfache Uhr
+
+var myVar=setInterval(function(){myTimer()},1000);
+
+function myTimer()
+{
+  var d=new Date();
+  var t=d.toLocaleTimeString();
+  document.getElementById("MyTime").innerHTML=t;
+}
+
+//---------------------------------------------------------------
+// Umschalten der Menu Seiten
+
+function switchToPage(value)
+{
+  menuMain.style.display="none";
+  menuCount.style.display="none";
+  menuAlert.style.display="none";
+
+  document.getElementById(value).style.display="";
+}
+
+//---------------------------------------------------------------
+// Einlesen der Bilder
+
+var ActBilder = new Array();;
+
+function handleFileSelect(evt) 
+{
+  // Reset the number
+  ActBilder = new Array();
+
+  //FileList object
+  var files = evt.target.files; 
+  
+  // Loop through FileList and remember images
+  for (var i=0, f; f=files[i]; i++) 
+  {
+    // Only process image files.
+    if (!f.type.match('image.*')){ continue; }
+
+	// remember all paths
+	ActBilder.push(f);
+  }
+  document.getElementById("inFile").innerHTML=ActBilder.length+" Images";
+}
+document.getElementById('files').addEventListener('change',handleFileSelect,false);
+
+//---------------------------------------------------------------
+// Starten des Timer, umschalten auf Uhr
+
+function initAlert()
+{
+  if (ActBilder.length==0) 
+  { 
+    alert("Keine Bilder geladen");
+  }
+  else
+  {
+	switchToPage("menuCount");
+    setTimeout(executeAlert,myTimeout.value*1000);
+  }
+}
+
+//---------------------------------------------------------------
+// Abbruch, umschalten auf Einstellungen
+
+function cancleAlert()
+{
+  switchToPage("menuMain");
+}
+
+//---------------------------------------------------------------
+// Abbruch, ende des Programms
+
+function quitProg()
+{
+  close();
+}
+
+//---------------------------------------------------------------
+// Alarm, Zufallszahl berechnen (Aus Anzahl der Bilder)
+// Umschalten auf Alarmseite zum Anzeigen.
+
+function executeAlert()
+{
+  switchToPage("menuAlert");
+  
+  //get random number from max elements
+  var num=Math.floor((Math.random()*ActBilder.length));
+
+  // set image title
+  document.getElementById("imgText").innerHTML=ActBilder[num].name.slice(0,-4);
+  
+  // create read for image source
+  var reader = new FileReader();
+  
+  reader.onloadend = function(evt) {
+    document.getElementById("imgField").src=evt.target.result;
+  };
+  reader.readAsDataURL(ActBilder[num]);  
+}
+
+//---------------------------------------------------------------
+</script>
+</body>
+</html>
+<!-------------------------------------------------------------->
+<!-------------------------------------------------------------->
